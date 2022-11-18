@@ -1,0 +1,91 @@
+# Carrots
+
+# The yield of four new varieties of carrots was measured [dt/ha].
+
+getwd()
+
+# we have a data and i will enter it on R
+
+amount <- c (28.3, 33.4, 29.5, 28.9, 33.2,
+             24.1, 24.6, 25.7, 23.5, 26.0,
+             29.6, 30.5, 31.2, 35.4, 34.5,
+             27.3, 28.1, 28.6, 27.0, 26.8)
+
+variety <- gl(n=4, k=1, length = 4*5, labels = c("Mokum", "Julia", "Neptun", "Bolero"))
+
+# I will use this command becuase it displays my data correctly.
+variety2 <- factor ( c( rep("Mokum", times=5), rep("Julia", times=5), 
+                        rep("Neptun", times=5), rep("Bolero", times=5)))
+variety2
+
+production <- data.frame (carrotType= variety,
+                          yield = amount)
+
+production2 <- data.frame (carrotType= variety2,
+                          yield = amount)
+
+# 3 version of data presentation
+
+production3 <- data.frame ( Mokum = c(28.3, 33.4, 29.5, 28.9, 33.2), 
+                            Julia = c(24.1, 24.6, 25.7, 23.5, 26.0), 
+                            Neptun = c(29.6, 30.5, 31.2, 35.4, 34.5),
+                            Bolero = c(27.3, 28.1, 28.6, 27.0, 26.8) )
+
+# I will use data production2
+
+attach(production2)
+str(yield)
+str(carrotType)
+
+# to describe our data we need to visualize the data.
+# For that purpose I use a boxplot/whiskerplot
+production2 <- data.frame (carrotType= variety2,
+                           yield = amount)
+boxplot ( yield ~ carrotType, # Box and Whisker plot
+          range = 0, # Min, max, quartiles, median
+          data=production2) # Name of the data set
+
+par ( mar=c(4,4,1,1) ) # No. of lines around the plot for
+# axis descriptions: bltr
+
+boxplot (yield ~ carrotType, # Model
+         ylab="The annual yield [dt/ha]", # Label for y axis
+         xlab="Type of carrot", # Label for x axis
+         col ="lightblue", # Color of boxes
+         range=0, # Whisker to min and max
+         ylim=c(20,40), # Range of y axis
+         data=production2)
+
+# to estimate means and variance of our sample we have to install a package
+# 
+install.packages("dplyr")
+
+
+# estimate means and variance
+production2 %>% group_by(carrotType) %>%
+  summarise ( n=n(), mean=mean(yield), var=var(yield),
+              min=min(yield), max=max(yield))
+dev.off()
+
+production2 %>% group_by(carrotType) %>% 
+  summarise ( n=n(), mean=mean(yield), var=var(yield) )
+
+bartlett.test(yield ~ carrotType)
+
+# to prove our H0 and H1 hpothesis we use this command
+summary(aov(yield ~ carrotType))
+
+
+# to find means of factor levels
+model.tables( aov(yield ~ carrotType))
+
+# sample mean command
+mean(yield)
+
+# to find outliers
+
+plot( cook.distance (aov (yield ~ carrotType) ))
+
+par( mfrow= c(2,2))
+plot( aov(yield ~ carrotType))
+
